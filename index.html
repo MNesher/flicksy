@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Flicksy - My Saved Screens</title>
+<meta name="theme-color" content="#fce4ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Flicksy">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍿</text></svg>">
+<link rel="apple-touch-icon" href="icons/icon.svg">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #faf5f0;
+    --card-bg: #ffffff;
+    --card-hover: #fff9fa;
+    --accent: #e07a8e;
+    --accent2: #9b8ec4;
+    --text: #3d3852;
+    --text-muted: #8e89a0;
+    --watched-bg: #f0f8f2;
+    --border: #ece6e0;
+    --netflix: #e25565;
+    --prime: #4db8d4;
+    --disney: #7b96e0;
+    --hulu: #5cc88c;
+    --peacock: #8a8a9a;
+    --paramount: #8ba3f0;
+    --plex: #d4ae4a;
+    --tubi: #e88a8a;
+    --apple: #a0a0a8;
+  }
+
+  body {
+    font-family: 'Rubik', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #fce4ec 0%, #e8daef 50%, #d4e6f1 100%);
+    padding: 24px 20px 18px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(224,122,142,0.12) 0%, transparent 50%);
+    animation: pulse 4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 1; }
+  }
+  .logo {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo-icon { font-size: 1.8em; }
+  .logo h1 {
+    font-size: 1.7em;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  .logo h1 span { color: var(--accent); }
+  .header .tagline {
+    color: var(--text-muted);
+    margin-top: 3px;
+    font-size: 0.78em;
+    position: relative;
+    z-index: 1;
+    font-weight: 300;
+  }
+  .stats-bar {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 12px;
+    position: relative;
+    z-index: 1;
+  }
+  .stat { text-align: center; }
+  .stat-num {
+    font-size: 1.4em;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .stat-label {
+    font-size: 0.65em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* CATEGORY TABS */
+  .categories {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    background: #fff;
+    border-bottom: 2px solid var(--border);
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .categories::-webkit-scrollbar { display: none; }
+  .cat-tab {
+    padding: 10px 18px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: 'Rubik', sans-serif;
+    font-size: 0.82em;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .cat-tab:hover { color: var(--accent); }
+  .cat-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    font-weight: 600;
+  }
+  .cat-tab .cat-count {
+    font-size: 0.75em;
+    background: var(--border);
+    padding: 1px 6px;
+    border-radius: 8px;
+    color: var(--text-muted);
+  }
+  .cat-tab.active .cat-count {
+    background: #fce4ec;
+    color: var(--accent);
+  }
+
+  /* FILTERS */
+  .filters {
+    padding: 8px 20px;
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    justify-content: center;
+    flex-wrap: wrap;
+    background: rgba(255,255,255,0.88);
+    backdrop-filter: blur(12px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+  }
+  .filter-btn {
+    padding: 5px 12px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    font-family: 'Rubik', sans-serif;
+    font-size: 0.75em;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+  }
+  .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  /* SEARCH */
+  .search-bar {
+    padding: 10px 20px;
+    max-width: 550px;
+    margin: 0 auto;
+  }
+  .search-bar input {
+    width: 100%;
+    padding: 9px 16px;
+    border-radius: 22px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--text);
+    font-family: 'Rubik', sans-serif;
+    font-size: 0.85em;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+  .search-bar input:focus { border-color: var(--accent); }
+  .search-bar input::placeholder { color: var(--text-muted); }
+
+  /* GRID - compact */
+  .grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px 16px;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  /* CARD - horizontal compact */
+  .card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.25s ease;
+    border: 1px solid var(--border);
+    position: relative;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.03);
+    display: flex;
+    flex-direction: row;
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(224,122,142,0.1);
+    border-color: var(--accent);
+  }
+  .card.watched {
+    background: var(--watched-bg);
+    border-color: #c5e1cd;
+  }
+  .card.watched:hover { background: #e8f5ea; }
+
+  .card-poster {
+    width: 85px;
+    min-height: 120px;
+    object-fit: cover;
+    display: block;
+    flex-shrink: 0;
+  }
+  .card-poster-placeholder {
+    width: 85px;
+    min-height: 120px;
+    background: linear-gradient(135deg, #f3e5f5, #e8daef, #d4e6f1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2em;
+    flex-shrink: 0;
+  }
+
+  .card-body {
+    padding: 8px 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    flex: 1;
+    min-width: 0;
+  }
+  .card-title {
+    font-size: 0.9em;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .card-type {
+    font-size: 0.58em;
+    padding: 2px 6px;
+    border-radius: 7px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .type-series { background: #ede4f5; color: #7c5cad; }
+  .type-movie { background: #fce4ec; color: #c06078; }
+
+  .card-genre {
+    color: var(--text-muted);
+    font-size: 0.68em;
+  }
+  .card-desc {
+    font-size: 0.72em;
+    color: var(--text-muted);
+    line-height: 1.35;
+    font-style: italic;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* STREAMING BADGES */
+  .platforms {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+  }
+  .platform-badge {
+    padding: 1px 7px;
+    border-radius: 8px;
+    font-size: 0.58em;
+    font-weight: 600;
+    color: white;
+    text-decoration: none;
+  }
+  .p-netflix { background: var(--netflix); }
+  .p-prime { background: var(--prime); }
+  .p-disney { background: var(--disney); }
+  .p-hulu { background: var(--hulu); color: #000; }
+  .p-peacock { background: var(--peacock); }
+  .p-paramount { background: var(--paramount); }
+  .p-plex { background: var(--plex); color: #000; }
+  .p-tubi { background: var(--tubi); }
+  .p-apple { background: var(--apple); }
+
+  /* ACTIONS */
+  .card-actions {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 2px;
+  }
+  .watch-btn {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 9px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    font-family: 'Rubik', sans-serif;
+    font-size: 0.65em;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .watch-btn:hover { border-color: #7bc8a4; color: #5aab84; }
+  .watch-btn.is-watched {
+    background: #d4edda;
+    border-color: #a8d5ba;
+    color: #4a8c6a;
+  }
+  .tiktok-link {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.65em;
+    padding: 2px 9px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    transition: all 0.3s;
+  }
+  .tiktok-link:hover { color: #7eb8bd; border-color: #7eb8bd; }
+  .delete-btn {
+    padding: 2px 6px;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.7em;
+    transition: all 0.3s;
+    margin-right: auto;
+  }
+  .delete-btn:hover { color: #e07a8e; border-color: #e07a8e; background: rgba(224,122,142,0.08); }
+
+  /* INSTALL BANNER */
+  .install-banner {
+    display: none;
+    background: linear-gradient(135deg, #fce4ec, #e8daef);
+    padding: 10px 16px;
+    text-align: center;
+    font-size: 0.8em;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  .install-banner:hover { background: linear-gradient(135deg, #f8d0d8, #dccde8); }
+  .install-banner.show { display: block; }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+  }
+  .empty-state .emoji { font-size: 2.5em; margin-bottom: 10px; }
+
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    .grid { padding: 6px 10px; gap: 6px; }
+    .logo h1 { font-size: 1.4em; }
+    .stats-bar { gap: 16px; }
+    .stat-num { font-size: 1.1em; }
+    .card-poster, .card-poster-placeholder { width: 75px; min-height: 105px; }
+    .card-body { padding: 6px 10px; }
+    .card-title { font-size: 0.84em; }
+    .header { padding: 20px 16px 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <span class="logo-icon">🍿</span>
+    <h1>Flick<span>sy</span></h1>
+  </div>
+  <p class="tagline">Your TikTok Saves, Beautifully Organized</p>
+  <div class="stats-bar">
+    <div class="stat">
+      <div class="stat-num" id="totalCount">0</div>
+      <div class="stat-label">Total</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="watchedCount">0</div>
+      <div class="stat-label">Watched</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="unwatchedCount">0</div>
+      <div class="stat-label">To Watch</div>
+    </div>
+  </div>
+</div>
+
+<div id="installBanner" class="install-banner" onclick="installApp()">
+  📲 Install Flicksy on your phone for offline use!
+</div>
+
+<div class="categories" id="categoryTabs"></div>
+
+<div class="filters">
+  <button class="filter-btn active" data-filter="all">All</button>
+  <button class="filter-btn" data-filter="series">Series</button>
+  <button class="filter-btn" data-filter="movie">Movies</button>
+  <button class="filter-btn" data-filter="watched">Watched</button>
+  <button class="filter-btn" data-filter="unwatched">To Watch</button>
+</div>
+
+<div class="search-bar">
+  <input type="text" id="searchInput" placeholder="Search movies, shows, genres...">
+</div>
+
+<div class="grid" id="grid"></div>
+
+<script>
+// ===== CATEGORY SYSTEM =====
+const categories = [
+  { id: 'movies', name: 'Movies', icon: '🎬' }
+  // More categories will be added as we scan TikTok collections
+];
+
+let currentCategory = 'movies';
+
+// ===== MOVIE DATA PER CATEGORY =====
+const defaultData = {
+  movies: [
+    {
+      id: 1,
+      title: "The Good Fight",
+      type: "series",
+      genre: "Drama / Legal",
+      desc: "A powerful woman demands to be hired — drama at its finest",
+      platforms: [{name:"Paramount+", class:"p-paramount"}],
+      poster: "https://media.themoviedb.org/t/p/w300/8qoOHOfbUbrCcHZnDVxGcwOWinV.jpg",
+      emoji: "?",
+      tiktok: "https://www.tiktok.com/@salvadorlerma/video/7611062296793664781",
+      watched: false
+    },
+    {
+      id: 2,
+      title: "All Her Fault",
+      type: "series",
+      genre: "Thriller / Suspense",
+      desc: "What happens when a child goes missing? Gripping suspense",
+      platforms: [{name:"Peacock", class:"p-peacock"}],
+      poster: "https://media.themoviedb.org/t/p/w300/o8vZKZlc8H4OcgpbJuqP0iK4B2.jpg",
+      emoji: "?",
+      tiktok: "https://www.tiktok.com/@ta_mmmm04/video/7610001702808292639",
+      watched: false
+    },
+    {
+      id: 3,
+      title: "Beef",
+      type: "series",
+      genre: "Dark Comedy / Drama",
+      desc: "Two strangers collide after a road rage incident. Steven Yeun & Ali Wong",
+      platforms: [{name:"Netflix", class:"p-netflix"}],
+      poster: "https://media.themoviedb.org/t/p/w300/4b4v7RnPhNyPEaVGFarEuo74r8W.jpg",
+      emoji: "?",
+      tiktok: "https://www.tiktok.com/@cinemooods.id/video/7610461952250367262",
+      watched: false
+    },
+    {
+      id: 4,
+      title: "His & Hers",
+      type: "series",
+      genre: "Thriller / Mystery",
+      desc: "Craziest plot twist! Tessa Thompson & Jon Bernthal",
+      platforms: [{name:"Netflix", class:"p-netflix"}],
+      poster: "https://media.themoviedb.org/t/p/w300/vRXw6fUD9B4RhMoTvhcJcnHYIMP.jpg",
+      emoji: "?",
+      tiktok: "https://www.tiktok.com/@cinemooods.id/video/7609354120658521375",
+      watched: false
+    },
+    {
+      id: 5,
+      title: "Castle",
+      type: "series",
+      genre: "Crime / Comedy / Romance",
+      desc: "Mystery novelist teams up with NYPD detective. Nathan Fillion & Stana Katic",
+      platforms: [{name:"Hulu", class:"p-hulu"},{name:"Disney+", class:"p-disney"},{name:"Netflix", class:"p-netflix"}],
+      poster: "https://media.themoviedb.org/t/p/w300/diXBeMzvfJb2iJg3G0kCUaMCzEc.jpg",
+      emoji: "?",
+      tiktok: "https://www.tiktok.com/@eteerniitty/video/7609687034801769748",
+      watched: false
+    },
+    {
+      id: 6,
+      title: "Marriage is Difficult for a Ninja",
+      type: "series",
+      genre: "Japanese Action / Comedy / Romance",
+      desc: "Married couple secretly ninjas from rival clans!",
+      platforms: [{name:"Prime", class:"p-prime"},{name:"Plex", class:"p-plex"}],
+      poster: "https://media.themoviedb.org/t/p/w300/AltC2KXyK9msukvKam0XqpVQJmc.jpg",
+      emoji: "?",
+      tiktok: "https://www.tiktok.com/@yorbfzpn54/video/7607726292015893791",
+      watched: false
+    },
+    {
+      id: 7,
+      title: "Houdini",
+      type: "series",
+      genre: "Drama / Biography",
+      desc: "Adrien Brody as the legendary escape artist",
+      platforms: [{name:"Prime", class:"p-prime"},{name:"Tubi", class:"p-tubi"},{name:"Plex", class:"p-plex"}],
+      poster: "https://media.themoviedb.org/t/p/w300/ba43f5KXfH01ipDmDR4lZSQyDkL.jpg",
+      emoji: "?",
+      tiktok: "https://www.tiktok.com/@framenova.hd/video/7609477838135135519",
+      watched: false
+    },
+    {
+      id: 8,
+      title: "Jungle",
+      type: "movie",
+      genre: "Adventure / True Story / Survival",
+      desc: "True story: Yossi Ghinsberg lost in the Amazon for 3 weeks",
+      platforms: [{name:"Prime", class:"p-prime"}],
+      poster: "https://media.themoviedb.org/t/p/w300/tDgxknTVwrScxpCYyGUjXSn5NRk.jpg",
+      emoji: "?",
+      tiktok: "https://www.tiktok.com/@jojojumps26/video/7610097869273550101",
+      watched: false
+    }
+  ]
+};
+
+// ===== STATE =====
+function getItems() {
+  const stored = localStorage.getItem('flicksy_' + currentCategory);
+  if (stored) return JSON.parse(stored);
+  return defaultData[currentCategory] || [];
+}
+
+let items = getItems();
+let currentFilter = 'all';
+
+function save() {
+  localStorage.setItem('flicksy_' + currentCategory, JSON.stringify(items));
+}
+
+// ===== CATEGORY TABS =====
+function renderCategoryTabs() {
+  const container = document.getElementById('categoryTabs');
+  container.innerHTML = categories.map(cat => {
+    const data = JSON.parse(localStorage.getItem('flicksy_' + cat.id)) || defaultData[cat.id] || [];
+    return `<button class="cat-tab ${cat.id === currentCategory ? 'active' : ''}" data-cat="${cat.id}">
+      ${cat.icon} ${cat.name}
+      <span class="cat-count">${data.length}</span>
+    </button>`;
+  }).join('');
+
+  container.querySelectorAll('.cat-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      currentCategory = tab.dataset.cat;
+      items = getItems();
+      currentFilter = 'all';
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector('.filter-btn[data-filter="all"]').classList.add('active');
+      document.getElementById('searchInput').value = '';
+      renderCategoryTabs();
+      renderCards();
+    });
+  });
+}
+
+// ===== STATS =====
+function updateStats() {
+  const total = items.length;
+  const watched = items.filter(m => m.watched).length;
+  document.getElementById('totalCount').textContent = total;
+  document.getElementById('watchedCount').textContent = watched;
+  document.getElementById('unwatchedCount').textContent = total - watched;
+}
+
+// ===== RENDER CARDS =====
+function renderCards() {
+  const grid = document.getElementById('grid');
+  const search = document.getElementById('searchInput').value.toLowerCase();
+
+  let filtered = items.filter(m => {
+    if (currentFilter === 'series' && m.type !== 'series') return false;
+    if (currentFilter === 'movie' && m.type !== 'movie') return false;
+    if (currentFilter === 'watched' && !m.watched) return false;
+    if (currentFilter === 'unwatched' && m.watched) return false;
+    if (search) {
+      const s = m.title.toLowerCase() + ' ' + m.genre.toLowerCase() + ' ' + m.desc.toLowerCase();
+      if (!s.includes(search)) return false;
+    }
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div class="empty-state"><div class="emoji">🍿</div><p>Nothing here yet</p></div>`;
+    updateStats();
+    return;
+  }
+
+  grid.innerHTML = filtered.map(m => `
+    <div class="card ${m.watched ? 'watched' : ''}" data-id="${m.id}">
+      ${m.poster
+        ? `<img class="card-poster" src="${m.poster}" alt="${m.title}" referrerpolicy="no-referrer" onerror="this.outerHTML='<div class=card-poster-placeholder>${m.emoji || '?'}</div>'">`
+        : `<div class="card-poster-placeholder">${m.emoji || '?'}</div>`
+      }
+      <div class="card-body">
+        <div class="card-title">
+          ${m.title}
+          <span class="card-type type-${m.type}">${m.type === 'series' ? 'Series' : 'Movie'}</span>
+        </div>
+        <div class="card-genre">${m.genre}</div>
+        <div class="card-desc">${m.desc}</div>
+        <div class="platforms">
+          ${m.platforms && m.platforms.length > 0
+            ? m.platforms.map(p => `<span class="platform-badge ${p.class}">${p.name}</span>`).join('')
+            : '<span style="color:var(--text-muted);font-size:0.7em">Check streaming</span>'
+          }
+        </div>
+        <div class="card-actions">
+          <button class="watch-btn ${m.watched ? 'is-watched' : ''}" onclick="toggleWatched(${m.id})">
+            ${m.watched ? '✅ Watched' : '⏳ To Watch'}
+          </button>
+          ${m.tiktok ? `<a href="${m.tiktok}" target="_blank" class="tiktok-link">TikTok</a>` : ''}
+          <button class="delete-btn" onclick="deleteItem(${m.id})" title="Delete">✕</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  updateStats();
+}
+
+function toggleWatched(id) {
+  const item = items.find(m => m.id === id);
+  if (item) {
+    item.watched = !item.watched;
+    save();
+    renderCards();
+  }
+}
+
+function deleteItem(id) {
+  if (confirm('Remove this from your list?')) {
+    items = items.filter(m => m.id !== id);
+    save();
+    renderCategoryTabs();
+    renderCards();
+  }
+}
+
+// ===== FILTER BUTTONS =====
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    renderCards();
+  });
+});
+
+// ===== SEARCH =====
+document.getElementById('searchInput').addEventListener('input', renderCards);
+
+// ===== PWA INSTALL =====
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBanner').classList.add('show');
+});
+
+function installApp() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => {
+      deferredPrompt = null;
+      document.getElementById('installBanner').classList.remove('show');
+    });
+  }
+}
+
+// ===== SERVICE WORKER =====
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').then(() => {
+    console.log('Flicksy: Service Worker registered');
+  }).catch(err => {
+    console.log('SW registration failed:', err);
+  });
+}
+
+// ===== INIT =====
+renderCategoryTabs();
+renderCards();
+</script>
+</body>
+</html>
